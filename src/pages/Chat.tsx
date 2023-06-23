@@ -37,7 +37,7 @@ export default function() {
             </Link>
         </div>
         <h1 className="text-xl font-bold dark:text-white mb-6">Lumira🌙</h1>
-        <ChatWindow chat={(chatIdx < 0 || chatIdx >= chats.length) ? { title: "New Chat", messages: [] } : chats[chatIdx] } />
+        <ChatWindow />
         <ChatBox addMessage={addMessage} />
     </div>
   );

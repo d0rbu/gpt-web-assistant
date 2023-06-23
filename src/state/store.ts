@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist, createJSONStorage, subscribeWithSelector } from 'zustand/middleware';
 
 // Define the store
 interface KeyStore {
@@ -26,27 +26,29 @@ export interface Chat {
 
 // Create the store
 export const useStore = create<KeyStore>()(
-  persist(
-    (set, get) => ({
-      key: '',
-      setKey: (key) => set({ key }),
-      chatIdx: 0,
-      setChatIdx: (chatIdx) => set({ chatIdx }),
-      chats: [],
-      addChat: (chat) => set((state) => ({ chats: [...state.chats, chat] })),
-      removeChat: (chatIdx) => {
-        const chats = [...get().chats];
-        chats.splice(chatIdx, 1);
-        set({ chats });
-      },
-      addToChat: (chatIdx, message) => {
-        const chats = [...get().chats];
-        chats[chatIdx].messages.push(message);
-        set({ chats });
-      },
-    }),
-    {
-      name: 'key-storage',
-    }
-  )
+  subscribeWithSelector(
+    persist(
+      (set, get) => ({
+        key: '',
+        setKey: (key) => set({ key }),
+        chatIdx: 0,
+        setChatIdx: (chatIdx) => set({ chatIdx }),
+        chats: [],
+        addChat: (chat) => set((state) => ({ chats: [...state.chats, chat] })),
+        removeChat: (chatIdx) => {
+          const chats = [...get().chats];
+          chats.splice(chatIdx, 1);
+          set({ chats });
+        },
+        addToChat: (chatIdx, message) => {
+          const chats = [...get().chats];
+          chats[chatIdx].messages.push(message);
+          set({ chats });
+        },
+      }),
+      {
+        name: 'key-storage',
+      }
+    ),
+  ),
 );

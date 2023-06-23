@@ -1,22 +1,43 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useStore, Chat, Message } from '../state/store';
 import { useNavigate, Link } from "react-router-dom";
 import ChatBubble from './ChatBubble';
 
 
-export default function({ chat }: { chat: Chat }) {
-  const { key } = useStore();
+export default function() {
+  const { chats, chatIdx } = useStore();
+  const [stuckToBottom, setStuckToBottom] = useState<boolean>(true);  // if we are at the bottom of the chat window
   const navigate = useNavigate();
+  const windowRef = useRef<HTMLDivElement>(null);
+  
+  // if we are at the bottom of the chat window, scroll down
+  useEffect(() => useStore.subscribe((state) => state.chats, (chats) => {
+    if (chatIdx < 0 || chatIdx >= chats.length) {
+      return;
+    }
+
+    if (!windowRef.current) {
+      return;
+    }
+
+    // if we are not at the bottom of the chat window
+    if (windowRef.current.scrollHeight - windowRef.current.scrollTop !== windowRef.current.clientHeight) {
+      setStuckToBottom(false);
+      return;
+    }
+    
+    setStuckToBottom(true);
+  }), []);
   
   return (
-    <div className="flex flex-col items-center justify-center w-full p-2 rounded-t-md bg-gray-100 dark:bg-gray-800 gap-2 max-h-96 min-h-12 overflow-y-auto scrollbar-hide">
+    <div className="w-full p-2 rounded-t-md bg-gray-100 dark:bg-gray-800 max-h-64 overflow-y-auto scrollbar-hide" ref={windowRef}>
+      <div className="flex flex-col items-center justify-center gap-2">
         {
-            chat.messages.map((message, index) => {
-                return (
-                    <ChatBubble message={message} ai={index % 2 === 0} key={index} />
-                );
-            })
+          (chatIdx < 0 || chatIdx >= chats.length) ? null : chats[chatIdx].messages.map((message, index) => {
+            return <ChatBubble message={message} key={index} scrollIntoView={index === chats[chatIdx].messages.length - 1 && stuckToBottom} />
+          })
         }
+      </div>
     </div>
   );
 }
