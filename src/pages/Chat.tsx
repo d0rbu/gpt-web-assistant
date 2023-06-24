@@ -1,14 +1,22 @@
 import { useEffect, useState } from 'react';
-import { useStore, Chat, Message } from '../state/store';
+import { useStore } from '../state/store';
+import { Chat, Message, LLM } from '../util/types';
 import { useNavigate, Link } from "react-router-dom";
 import ChatWindow from '../components/ChatWindow';
 import ChatBox from '../components/ChatBox';
 
 
 export default function() {
-  const { key, chatIdx, setChatIdx, chats, addToChat, addChat } = useStore();
-  const navigate = useNavigate();
+  const { key, chatIdx, setChatIdx, chats, llm, addToChat, addChat } = useStore();
+  const [thinking, setThinking] = useState<boolean>(false);
+
+  useEffect(() => {
+
+  }, [chats])
+
   const addMessage: (content: string) => void = (content) => {
+    setThinking(true);
+
     const message: Message = {
       content,
       timestamp: new Date(),
@@ -23,10 +31,12 @@ export default function() {
 
       setChatIdx(chats.length);
       addChat(newChat);
-      return;
+    } else {
+      addToChat(chatIdx, message);
     }
-    
-    addToChat(chatIdx, message);
+
+    // TODO: get chatgpt response and stream it
+    // llm.stream or something
   }
   
   return (
@@ -38,7 +48,7 @@ export default function() {
         </div>
         <h1 className="text-xl font-bold dark:text-white mb-6">Lumira🌙</h1>
         <ChatWindow />
-        <ChatBox addMessage={addMessage} />
+        <ChatBox thinking={thinking} addMessage={addMessage} />
     </div>
   );
 }

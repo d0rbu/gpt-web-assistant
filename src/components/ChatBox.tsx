@@ -2,7 +2,7 @@ import { useEffect, useState, createRef } from 'react';
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid'
 
 
-export default function ({ addMessage }: { addMessage: (message: string) => void }) {
+export default function ({ thinking, addMessage }: { thinking: boolean, addMessage: (message: string) => void }) {
   const [message, setMessage] = useState<string>("");
   const textareaRef: React.RefObject<HTMLTextAreaElement> = createRef();
   const formRef: React.RefObject<HTMLFormElement> = createRef();
@@ -10,6 +10,12 @@ export default function ({ addMessage }: { addMessage: (message: string) => void
   useEffect(() => {
     adjustTextareaHeight();
   }, [message]);
+
+  useEffect(() => {
+    if (!thinking) {
+      textareaRef.current?.focus();
+    }
+  }, [thinking]);
 
   const submitMessage = () => {
     if (message.trim() === "") {
@@ -47,9 +53,9 @@ export default function ({ addMessage }: { addMessage: (message: string) => void
     <div className="rounded-b-lg dark:bg-gray-700 w-full">
       <div className="flex flex-row w-full h-full dark:text-white">
         <form onSubmit={handleSubmit} ref={formRef} className="grow h-full">
-          <textarea ref={textareaRef} rows={1} className="w-full dark:bg-gray-700 dark:text-white px-3 pt-3 pb-2 text-md resize-none overflow-hidden focus:outline-none" value={message} onChange={handleInputChange} onKeyDown={handleKeyDown} />
+          <textarea disabled={thinking} ref={textareaRef} rows={1} className="w-full dark:bg-gray-700 dark:text-white px-3 pt-3 pb-2 text-md resize-none overflow-hidden focus:outline-none" value={message} onChange={handleInputChange} onKeyDown={handleKeyDown} />
         </form>
-        <PaperAirplaneIcon className='w-11 h-11 text-gray-500 dark:text-gray-300 cursor-pointer p-3' onClick={submitMessage} />
+        <PaperAirplaneIcon className={`w-11 h-11 ${thinking ? "text-gray-400 dark:text-gray-400 cursor-not-allowed" : "text-gray-500 dark:text-gray-300 cursor-pointer"} p-3`} onClick={submitMessage} />
       </div>
     </div>
   );

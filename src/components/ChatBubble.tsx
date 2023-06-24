@@ -1,4 +1,5 @@
-import { useStore, Chat, Message } from '../state/store';
+import { useStore } from '../state/store';
+import { Chat, Message } from '../util/types';
 import { useEffect, useState, useRef } from 'react';
 
 
