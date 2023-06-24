@@ -30,11 +30,11 @@ export default function() {
   }), []);
   
   return (
-    <div className="w-full p-2 rounded-t-md bg-gray-100 dark:bg-gray-800 min-h-[8rem] max-h-64 overflow-y-auto scrollbar-hide" ref={windowRef}>
+    <div className="w-full pt-2 px-2 rounded-t-md bg-gray-100 dark:bg-gray-800 min-h-[8rem] max-h-64 overflow-y-auto scrollbar-hide" ref={windowRef}>
       <div className="flex flex-col items-center justify-center gap-2">
         {
           (chatIdx < 0 || chatIdx >= chats.length) ? null : chats[chatIdx].messages.map((message, index) => {
-            return <ChatBubble message={message} key={index} scrollIntoView={index === chats[chatIdx].messages.length - 1 && stuckToBottom} />
+            return <ChatBubble parentWindowRef={windowRef} message={message} key={index} scrollIntoView={index === chats[chatIdx].messages.length - 1 && stuckToBottom} />
           })
         }
       </div>

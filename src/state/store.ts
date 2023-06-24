@@ -15,6 +15,7 @@ interface KeyStore {
   addChat: (chat: Chat) => void;
   removeChat: (chatIdx: number) => void;
   addToChat: (chatIdx: number, message: Message) => void;
+  addToLastChatMessageContent: (chatIdx: number, content: string) => void;
 }
 
 // Create the store
@@ -40,6 +41,11 @@ export const useStore = create<KeyStore>()(
           chats[chatIdx].messages.push(message);
           set({ chats });
         },
+        addToLastChatMessageContent: (chatIdx, content) => {
+          const chats = [...get().chats];
+          chats[chatIdx].messages[chats[chatIdx].messages.length - 1].content += content;
+          set({ chats });
+        }
       }),
       {
         name: 'key-storage',

@@ -10,7 +10,7 @@ const LLM_FAILURE_MESSAGE: string = "Failed to reach LLM. Please check your key 
 
 
 export default function() {
-  const { key, chatIdx, setChatIdx, chats, llm, addToChat, addChat } = useStore();
+  const { key, chatIdx, setChatIdx, chats, llm, addToChat, addChat, addToLastChatMessageContent } = useStore();
   const [thinking, setThinking] = useState<boolean>(false);
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function() {
         messages: [message, reply],
       }
 
-      currentChat = newChat;
+      currentChat = JSON.parse(JSON.stringify(newChat));
       setChatIdx(chats.length);
       addChat(newChat);
     } else {
@@ -51,7 +51,6 @@ export default function() {
 
     currentChat.messages.push(message);
 
-    console.log(llm);
     let stream: ReadableStream<Uint8Array>;;
     try {
       stream = await llm.chatCompletionStream(currentChat);
@@ -72,22 +71,11 @@ export default function() {
       }
       // Massage and parse the chunk of data
       const chunk = decoder.decode(value);
-      const lines = chunk.split("\\n");
-      const parsedLines = lines
-        .map((line) => line.replace(/^data: /, "").trim()) // Remove the "data: " prefix
-        .filter((line) => line !== "" && line !== "[DONE]") // Remove empty lines and "[DONE]"
-        .map((line) => JSON.parse(line)); // Parse the JSON string
-
-      for (const parsedLine of parsedLines) {
-        const { choices } = parsedLine;
-        const { delta } = choices[0];
-        const { content } = delta;
-        // Update the UI with the new content
-        if (content) {
-          reply.content += content;
-        }
-      }
+      console.log(chunk);
+      addToLastChatMessageContent(chatIdx, chunk);
     }
+
+
 
     setThinking(false);
   }

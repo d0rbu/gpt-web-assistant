@@ -11,12 +11,11 @@ export const GPT: LLM = {
         return OpenAI(
             "chat",
             {
-                model: "text-davinci-003",
+                model: "gpt-3.5-turbo",
                 messages: chat.messages.map((message: Message) => ({
                     content: message.content,
                     role: message.sender,
                 })),
-                stream: true,
             },
             {
                 apiKey: key,
