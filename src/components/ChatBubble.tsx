@@ -19,8 +19,8 @@ export default function({ message, scrollIntoView }: { message: Message, scrollI
     }, [scrollIntoView]);
 
     return (
-        <div className="flex flex-row items-center justify-end w-full" ref={chatBubble}>
-            <div className={`flex flex-col ${message.sender === "user" ? "items-end" : "items-start"} justify-start p-2 rounded-lg bg-gray-200 dark:bg-gray-700 max-w-xs`}>
+        <div className={`flex flex-row items-center ${message.sender == "user" ? "justify-end" : "justify-start"} w-full`} ref={chatBubble}>
+            <div className={`p-2 rounded-lg bg-gray-200 dark:bg-gray-700 max-w-xs`}>
                 <p className="text-sm dark:text-white whitespace-pre-line w-full break-words">{message.content}</p>
             </div>
         </div>

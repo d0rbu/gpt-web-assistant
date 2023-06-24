@@ -10,5 +10,6 @@ export interface Chat {
 }
 
 export interface LLM {
-  name: string;  // TODO: figure out this interface
+  name: string;
+  chatCompletionStream: (chat: Chat) => Promise<ReadableStream<Uint8Array>>;
 }

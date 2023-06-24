@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage, subscribeWithSelector } from 'zustand/middleware';
 import { Message, Chat, LLM } from '../util/types';
+import { GPT } from '../util/llms';
 
 // Define the store
 interface KeyStore {
@@ -8,7 +9,7 @@ interface KeyStore {
   setKey: (key: string) => void;
   chatIdx: number;
   setChatIdx: (chatIdx: number) => void;
-  llm?: LLM;
+  llm: LLM;
   setLLM: (llm: LLM) => void;
   chats: Chat[];
   addChat: (chat: Chat) => void;
@@ -25,7 +26,7 @@ export const useStore = create<KeyStore>()(
         setKey: (key) => set({ key }),
         chatIdx: 0,
         setChatIdx: (chatIdx) => set({ chatIdx }),
-        llm: undefined,
+        llm: GPT,
         setLLM: (llm) => set({ llm }),
         chats: [],
         addChat: (chat) => set((state) => ({ chats: [...state.chats, chat] })),
