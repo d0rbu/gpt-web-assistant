@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage, subscribeWithSelector } from 'zustand/middleware';
 import { Message, Chat, LLM } from '../util/types';
-import { GPT } from '../util/llms';
+import LLMS from '../util/llms';
 
 // Define the store
 interface KeyStore {
@@ -27,7 +27,7 @@ export const useStore = create<KeyStore>()(
         setKey: (key) => set({ key }),
         chatIdx: 0,
         setChatIdx: (chatIdx) => set({ chatIdx }),
-        llm: GPT,
+        llm: new LLMS.GPT(),
         setLLM: (llm) => set({ llm }),
         chats: [],
         addChat: (chat) => set((state) => ({ chats: [...state.chats, chat] })),
