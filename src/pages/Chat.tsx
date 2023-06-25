@@ -81,7 +81,7 @@ export default function() {
   }
   
   return (
-    <div className="flex flex-col items-center w-96 p-2 dark:bg-gray-900">
+    <div className="flex flex-col items-center w-[26rem] p-2 dark:bg-gray-900">
         <div className="w-full flex flex-row justify-between dark:text-white">
             <Link to="/key">
                 <h1 className="text-md underline">Set Key</h1>
