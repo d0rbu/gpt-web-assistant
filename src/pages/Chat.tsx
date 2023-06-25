@@ -6,9 +6,6 @@ import ChatWindow from '../components/ChatWindow';
 import ChatBox from '../components/ChatBox';
 
 
-const LLM_FAILURE_MESSAGE: string = "Failed to reach LLM. Please check your key and try again.";
-
-
 export default function() {
   const { key, chatIdx, setChatIdx, chats, llm, addToChat, addChat, addToLastChatMessageContent } = useStore();
   const [thinking, setThinking] = useState<boolean>(false);
@@ -56,7 +53,10 @@ export default function() {
       stream = await llm.chatCompletionStream(currentChat);
     } catch (e) {
       console.log(`Failed to reach LLM: ${e}`);
-      reply.content = LLM_FAILURE_MESSAGE;
+      console.log(chats);
+      if (!chats[chatIdx].messages[chats[chatIdx].messages.length - 1].content) {
+        addToLastChatMessageContent(chatIdx, `Failed to reach ${llm.name}. Please check your key and try again.`);
+      }
       setThinking(false);
       return;
     }
@@ -71,7 +71,7 @@ export default function() {
       }
       // Massage and parse the chunk of data
       const chunk = decoder.decode(value);
-      console.log(chunk);
+      // console log chunk but replace newlines with \n characters
       addToLastChatMessageContent(chatIdx, chunk);
     }
 
@@ -88,7 +88,7 @@ export default function() {
             </Link>
         </div>
         <h1 className="text-xl font-bold dark:text-white mb-6">Lumira🌙</h1>
-        <ChatWindow />
+        <ChatWindow thinking={thinking} />
         <ChatBox thinking={thinking} addMessage={addMessage} />
     </div>
   );

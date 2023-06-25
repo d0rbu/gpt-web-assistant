@@ -5,36 +5,26 @@ import { useNavigate, Link } from "react-router-dom";
 import ChatBubble from './ChatBubble';
 
 
-export default function() {
+export default function({ thinking }: { thinking: boolean }) {
   const { chats, chatIdx } = useStore();
-  const [stuckToBottom, setStuckToBottom] = useState<boolean>(true);  // if we are at the bottom of the chat window
   const windowRef = useRef<HTMLDivElement>(null);
-  
-  // if we are at the bottom of the chat window, scroll down
-  useEffect(() => useStore.subscribe((state) => state.chats, (chats) => {
-    if (chatIdx < 0 || chatIdx >= chats.length) {
-      return;
-    }
+  const chatRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
     if (!windowRef.current) {
       return;
     }
 
-    // if we are not at the bottom of the chat window
-    if (windowRef.current.scrollHeight - windowRef.current.scrollTop !== windowRef.current.clientHeight) {
-      setStuckToBottom(false);
-      return;
-    }
-    
-    setStuckToBottom(true);
-  }), []);
+    // scroll to bottom
+    windowRef.current.scrollTop = windowRef.current.scrollHeight;
+  }, [chatIdx]);
   
   return (
-    <div className="w-full pt-2 px-2 rounded-t-md bg-gray-100 dark:bg-gray-800 min-h-[8rem] max-h-64 overflow-y-auto scrollbar-hide" ref={windowRef}>
-      <div className="flex flex-col items-center justify-center gap-2">
+    <div className="w-full pt-2 px-2 rounded-t-md bg-gray-100 dark:bg-gray-800 min-h-[8rem] max-h-96 overflow-y-auto scrollbar-hide" ref={windowRef}>
+      <div className="flex flex-col items-center justify-center gap-2" ref={chatRef}>
         {
           (chatIdx < 0 || chatIdx >= chats.length) ? null : chats[chatIdx].messages.map((message, index) => {
-            return <ChatBubble parentWindowRef={windowRef} message={message} key={index} scrollIntoView={index === chats[chatIdx].messages.length - 1 && stuckToBottom} />
+            return <ChatBubble grandparentWindowRef={windowRef} parentWindowRef={chatRef} message={message} idx={index} key={index} />
           })
         }
       </div>

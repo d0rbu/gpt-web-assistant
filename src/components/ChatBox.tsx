@@ -2,6 +2,9 @@ import { useEffect, useState, createRef } from 'react';
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid'
 
 
+const TEXTAREA_MAX_HEIGHT = 100;
+
+
 export default function ({ thinking, addMessage }: { thinking: boolean, addMessage: (message: string) => void }) {
   const [message, setMessage] = useState<string>("");
   const textareaRef: React.RefObject<HTMLTextAreaElement> = createRef();
@@ -45,15 +48,15 @@ export default function ({ thinking, addMessage }: { thinking: boolean, addMessa
   const adjustTextareaHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, TEXTAREA_MAX_HEIGHT)}px`;
     }
   };
 
   return (
-    <div className="rounded-b-lg dark:bg-gray-700 w-full">
+    <div className={`rounded-b-lg ${thinking ? "dark:bg-gray-600 bg-gray-200" : "dark:bg-gray-700 bg-gray-100"} w-full`}>
       <div className="flex flex-row w-full h-full dark:text-white">
-        <form onSubmit={handleSubmit} ref={formRef} className="grow h-full">
-          <textarea disabled={thinking} ref={textareaRef} rows={1} className="w-full dark:bg-gray-700 dark:text-white px-3 pt-3 pb-2 text-md resize-none overflow-hidden focus:outline-none" value={message} onChange={handleInputChange} onKeyDown={handleKeyDown} />
+        <form onSubmit={handleSubmit} ref={formRef} className="grow h-full px-3 pt-3 pb-2">
+          <textarea disabled={thinking} ref={textareaRef} rows={1} className="w-full bg-transparent dark:text-white text-md resize-none overflow-auto scrollbar-hide focus:outline-none" value={message} onChange={handleInputChange} onKeyDown={handleKeyDown} />
         </form>
         <PaperAirplaneIcon className={`w-11 h-11 ${thinking ? "text-gray-400 dark:text-gray-400 cursor-not-allowed" : "text-gray-500 dark:text-gray-300 cursor-pointer"} p-3`} onClick={submitMessage} />
       </div>
