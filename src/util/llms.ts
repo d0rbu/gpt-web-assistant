@@ -6,7 +6,7 @@ import { GPTPrompt, Prompt } from './prompts';
 import { IVSSimilaritySearchItem } from 'vector-storage';
 
 
-const CONTEXT_K: number = 10;
+const CONTEXT_K: number = 5;
 
 const prompt: Prompt = new GPTPrompt();
 

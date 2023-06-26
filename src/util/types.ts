@@ -33,9 +33,13 @@ export abstract class LLM {
 export interface WebsiteMetadata {
   title: string;
   url: string;
-  summary?: string;
 }
 
 export interface WebsiteContent extends WebsiteMetadata {
   text: string;
+}
+
+export interface RawWebsiteContent {
+  url: string;
+  document: string;
 }
