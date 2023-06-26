@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../state/store';
 import { useNavigate } from "react-router-dom";
+import { GPT } from '../util/llms';
+import browser from "webextension-polyfill";
 
+
+const keyConnection = browser.runtime.connect({ name: "key" });
 
 export default function() {
-  const { key, setKey } = useStore();
+  const { key, setKey, setLLM } = useStore();
   const navigate = useNavigate();
 
   const submitKey = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    keyConnection.postMessage(key);
+    setLLM(new GPT());
     navigate("/chat");
   }
 

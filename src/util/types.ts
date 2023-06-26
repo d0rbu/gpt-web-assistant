@@ -1,3 +1,7 @@
+import { VectorDB, VectorStorageDB } from "./vectordb";
+import { useStore } from "../state/store";
+
+
 export interface Message {
   content: string;
   timestamp: Date;
@@ -9,14 +13,27 @@ export interface Chat {
   messages: Message[];
 }
 
-export interface LLM {
-  name: string;
-  chatCompletionStream: (chat: Chat) => Promise<ReadableStream<Uint8Array>>;
+export abstract class LLM {
+  abstract name: string;
+  abstract chatCompletionStream: (chat: Chat) => Promise<ReadableStream<Uint8Array>>;
+  
+  db: VectorDB | null = null;
+
+  constructor() {
+    useStore.subscribe((state) => state.key, (key) => {
+      if (key) {
+        this.db = new VectorStorageDB(key);
+      } else {
+        this.db = null;
+      }
+    });
+  }
 }
 
 export interface WebsiteMetadata {
   title: string;
   url: string;
+  summary?: string;
 }
 
 export interface WebsiteContent extends WebsiteMetadata {

@@ -9,7 +9,7 @@ interface KeyStore {
   setKey: (key: string) => void;
   chatIdx: number;
   setChatIdx: (chatIdx: number) => void;
-  llm: LLM;
+  llm?: LLM;
   setLLM: (llm: LLM) => void;
   chats: Chat[];
   addChat: (chat: Chat) => void;
@@ -27,7 +27,7 @@ export const useStore = create<KeyStore>()(
         setKey: (key) => set({ key }),
         chatIdx: 0,
         setChatIdx: (chatIdx) => set({ chatIdx }),
-        llm: new LLMS.GPT(),
+        llm: undefined,
         setLLM: (llm) => set({ llm }),
         chats: [],
         addChat: (chat) => set((state) => ({ chats: [...state.chats, chat] })),

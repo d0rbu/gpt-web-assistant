@@ -10,7 +10,7 @@ export abstract class VectorDB {
             return this.addContents([content]).then((docs) => docs[0]);
         }
     }
-    public abstract search(query: string, k?: number): Promise<IVSDocument<WebsiteMetadata>[]>;
+    public abstract search(query: string, k?: number): Promise<IVSSimilaritySearchItem<WebsiteMetadata>[]>;
     
     protected abstract addContents(contents: WebsiteContent[]): Promise<IVSDocument<WebsiteMetadata>[]>;
 }
@@ -39,7 +39,12 @@ export class VectorStorageDB extends VectorDB {
     protected async addContents(contents: WebsiteContent[]): Promise<IVSDocument<WebsiteMetadata>[]> {
         const { texts, metadatas }: { texts: string[], metadatas: WebsiteMetadata[] } = contents.reduce((accumulator: { texts: string[], metadatas: WebsiteMetadata[] }, content: WebsiteContent) => {
             accumulator.texts.push(content.text);
-            accumulator.metadatas.push({ url: content.url, title: content.title });
+            // push everything but text
+            accumulator.metadatas.push({
+                title: content.title,
+                url: content.url,
+                summary: content.summary,
+            });
             return accumulator;
         }, {
             texts: [],
