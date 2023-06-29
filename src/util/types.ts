@@ -1,5 +1,6 @@
 import { VectorDB, VectorStorageDB } from "./vectordb";
 import { useStore } from "../state/store";
+import { Readability } from "@mozilla/readability";
 
 
 export interface Message {
@@ -41,5 +42,5 @@ export interface WebsiteContent extends WebsiteMetadata {
 
 export interface RawWebsiteContent {
   url: string;
-  document: string;
+  parsed: any;
 }

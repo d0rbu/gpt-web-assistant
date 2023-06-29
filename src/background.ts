@@ -1,31 +1,14 @@
 import browser, { Runtime } from "webextension-polyfill";
 import { VectorStorageDB, VectorDB } from "./util/vectordb";
 import { RawWebsiteContent, WebsiteContent, WebsiteMetadata } from "./util/types";
-import { IVSDocument } from "vector-storage";
-import { Document } from "langchain/document"
-import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
-import * as cheerio from "cheerio";
+import { splitDocument } from "./util/split";
 
 
 let db: VectorDB | null = null;
+const CHUNK_SIZE: number = 1000;
 
 
-async function splitDocument(text: string, url: string) {
-  const rawDocs = new Document({
-    pageContent: text,
-    metadata: { source: url, type: "scrape" },
-  })
-  const textSplitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 500,
-    chunkOverlap: 100,
-  })
-  const docs = await textSplitter.splitDocuments([rawDocs])
-
-  return docs
-}
-
-
-browser.runtime.onConnect.addListener((port: Runtime.port) => {
+browser.runtime.onConnect.addListener((port: Runtime.Port) => {
   console.log("Connected to port", port);
   let connected: boolean = false;
 
@@ -45,22 +28,20 @@ browser.runtime.onConnect.addListener((port: Runtime.port) => {
     port.onMessage.addListener(async (website: RawWebsiteContent) => {
       console.log("Website received", website);
       if (db) {
-        const $ = cheerio.load(website.document);
-        const title: string = $("title").text();
-        const text: string = $("body").text();
+        let chunks: string[]  = await splitDocument(website.parsed.textContent, CHUNK_SIZE, website.url);
 
-        let chunks: Document[]  = await splitDocument(text, website.url);
-
-        const contents = chunks.map((chunk) => {
+        const contents: WebsiteContent[] = chunks.map((chunk) => {
           return {
-            title,
+            title: website.parsed.title,
             url: website.url,
-            text: chunk.pageContent,
+            text: chunk,
           };
         });
 
-        const documents = await db.add(contents);
-        console.log("Documents added", documents);
+        console.log(contents);
+
+        // const documents = await db.add(contents);
+        // console.log("Documents added", documents);
       }
     });
 
