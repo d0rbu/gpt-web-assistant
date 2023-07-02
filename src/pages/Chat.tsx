@@ -50,12 +50,17 @@ export default function() {
 
     let stream: ReadableStream<Uint8Array>;;
     try {
+      if (!llm) {
+        throw new Error("No LLM set");
+      }
+
+      console.log(llm);
       stream = await llm.chatCompletionStream(currentChat);
     } catch (e) {
       console.log(`Failed to reach LLM: ${e}`);
       console.log(chats);
-      if (!chats[chatIdx].messages[chats[chatIdx].messages.length - 1].content) {
-        addToLastChatMessageContent(chatIdx, `Failed to reach ${llm.name}. Please check your key and try again.`);
+      if (!chats[chatIdx]?.messages[chats[chatIdx]?.messages.length - 1].content) {
+        addToLastChatMessageContent(chatIdx, `Failed to reach ${llm?.name}. Please check your key and try again.`);
       }
       setThinking(false);
       return;
@@ -74,7 +79,6 @@ export default function() {
       // console log chunk but replace newlines with \n characters
       addToLastChatMessageContent(chatIdx, chunk);
     }
-
 
 
     setThinking(false);

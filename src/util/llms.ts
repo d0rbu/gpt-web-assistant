@@ -1,3 +1,4 @@
+import browser, { Runtime } from "webextension-polyfill";
 import { Chat, Message, LLM, WebsiteMetadata } from '../util/types';
 import { OpenAI } from 'openai-streams';
 import { useStore } from '../state/store';
@@ -12,10 +13,32 @@ const prompt: Prompt = new GPTPrompt();
 
 export class GPT extends LLM {
     name: string = 'ChatGPT';
+    searchPort: Runtime.Port;
+
+    constructor() {
+        super();
+        
+        this.searchPort = browser.runtime.connect({ name: "search" });
+    }
+
     chatCompletionStream: (chat: Chat) => Promise<ReadableStream<Uint8Array>> = async (chat) => {
         const { key } = useStore.getState();
         const lastMessage = chat.messages[chat.messages.length - 1];
-        const context: IVSSimilaritySearchItem<WebsiteMetadata>[] = this.db ? await this.db.search(lastMessage.content, CONTEXT_K) : [];
+        console.log(`Searching for documents similar to ${lastMessage.content}`);
+        // const context: IVSSimilaritySearchItem<WebsiteMetadata>[] = [];
+        // message service worker to perform search using browser runtime
+        const port: Runtime.Port = browser.runtime.connect({ name: "search" });
+        port.postMessage({
+            query: lastMessage.content,
+            k: CONTEXT_K,
+        });
+        const context: IVSSimilaritySearchItem<WebsiteMetadata>[] = await new Promise((resolve, reject) => {
+            port.onMessage.addListener((results: IVSSimilaritySearchItem<WebsiteMetadata>[]) => {
+                resolve(results);
+            });
+        });
+        console.log(`Found ${context.length} similar documents:`);
+        console.log(context.map((item) => item.metadata.title));
 
         const lastMessageWithContext = prompt.getTaskPrompt(context, lastMessage.content);
 

@@ -16,19 +16,7 @@ export interface Chat {
 
 export abstract class LLM {
   abstract name: string;
-  abstract chatCompletionStream: (chat: Chat) => Promise<ReadableStream<Uint8Array>>;
-  
-  db: VectorDB | null = null;
-
-  constructor() {
-    useStore.subscribe((state) => state.key, (key) => {
-      if (key) {
-        this.db = new VectorStorageDB(key);
-      } else {
-        this.db = null;
-      }
-    });
-  }
+  abstract chatCompletionStream(chat: Chat): Promise<ReadableStream<Uint8Array>>;
 }
 
 export interface WebsiteMetadata {

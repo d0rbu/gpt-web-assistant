@@ -33,7 +33,14 @@ export class VectorStorageDB extends VectorDB {
             k,
         };
 
-        return this.store.similaritySearch(searchParams).then(({ similarItems, query }) => similarItems);
+        return this.store.similaritySearch(searchParams).then(({ similarItems, query }) => {
+            console.log(`Query:`);
+            console.log(query);
+            console.log(`Similar Items:`);
+            console.log(similarItems);
+
+            return similarItems;
+        });
     }
 
     protected async addContents(contents: WebsiteContent[]): Promise<IVSDocument<WebsiteMetadata>[]> {
@@ -43,7 +50,6 @@ export class VectorStorageDB extends VectorDB {
             accumulator.metadatas.push({
                 title: content.title,
                 url: content.url,
-                summary: content.summary,
             });
             return accumulator;
         }, {

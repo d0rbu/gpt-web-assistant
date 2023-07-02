@@ -2,10 +2,29 @@ import browser, { Runtime } from "webextension-polyfill";
 import { RawWebsiteContent } from "./util/types";
 import { Readability } from "@mozilla/readability";
 
-// wait until website ready
-window.addEventListener("load", async () => {
+
+const SEND_DELAY: number = 8000;
+const sitesSent: Set<string> = new Set();
+
+
+async function sendWebsite() {
+  if (sitesSent.has(window.location.href)) {
+    return;
+  }
+  sitesSent.add(window.location.href);
+  
   // get current url
   const url: string = window.location.href;
+
+  console.log(`Sending website ${url} in ${SEND_DELAY}ms`);
+
+  await new Promise((resolve) => setTimeout(resolve, SEND_DELAY));
+
+  if (window.location.href !== url) {
+    return;
+  }
+
+  console.log(`Sending website ${url}`);
 
   const reader: Readability = new Readability(document.cloneNode(true) as Document);
   const parsed = reader.parse();
@@ -24,4 +43,19 @@ window.addEventListener("load", async () => {
   port.postMessage(rawContent);
 
   console.log("Website sent", rawContent);
+}
+
+const observer: MutationObserver = new MutationObserver((mutationsList) => {
+  console.log(mutationsList);
+  for (const mutation of mutationsList) {
+    if (mutation.type === "attributes" && mutation.attributeName === "href") {
+      sendWebsite();
+    }
+  }
+});
+
+observer.observe(document.documentElement, {
+  attributes: true,
+  attributeFilter: ["href"],
+  subtree: true
 });
