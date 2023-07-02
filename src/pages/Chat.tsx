@@ -11,8 +11,8 @@ export default function() {
   const [thinking, setThinking] = useState<boolean>(false);
 
   useEffect(() => {
-
-  }, [chats])
+    console.log(llm);
+  }, [])
 
   async function addMessage(content: string) {
     setThinking(true);

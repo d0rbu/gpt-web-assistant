@@ -14,13 +14,6 @@ const prompt: Prompt = new GPTPrompt();
 export class GPT extends LLM {
     name: string = 'ChatGPT';
     searchPort: Runtime.Port;
-
-    constructor() {
-        super();
-        
-        this.searchPort = browser.runtime.connect({ name: "search" });
-    }
-
     chatCompletionStream: (chat: Chat) => Promise<ReadableStream<Uint8Array>> = async (chat) => {
         const { key } = useStore.getState();
         const lastMessage = chat.messages[chat.messages.length - 1];
@@ -65,6 +58,12 @@ export class GPT extends LLM {
                 apiKey: key,
             }
         )
+    }
+
+    constructor() {
+        super();
+        
+        this.searchPort = browser.runtime.connect({ name: "search" });
     }
 };
 
