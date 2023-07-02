@@ -8,13 +8,13 @@ const sitesSent: Set<string> = new Set();
 
 
 async function sendWebsite() {
-  if (sitesSent.has(window.location.href)) {
-    return;
-  }
-  sitesSent.add(window.location.href);
-  
   // get current url
   const url: string = window.location.href;
+
+  if (sitesSent.has(url)) {
+    return;
+  }
+  sitesSent.add(url);
 
   console.log(`Sending website ${url} in ${SEND_DELAY}ms`);
 
@@ -43,10 +43,17 @@ async function sendWebsite() {
   port.postMessage(rawContent);
 
   console.log("Website sent", rawContent);
+
+  // listen for response
+  port.onMessage.addListener((success: boolean) => {
+    if (!success) {
+      console.log(`Website not stored: ${url}`);
+      sitesSent.delete(url);
+    }
+  });
 }
 
 const observer: MutationObserver = new MutationObserver((mutationsList) => {
-  console.log(mutationsList);
   for (const mutation of mutationsList) {
     if (mutation.type === "attributes" && mutation.attributeName === "href") {
       sendWebsite();
@@ -59,3 +66,5 @@ observer.observe(document.documentElement, {
   attributeFilter: ["href"],
   subtree: true
 });
+
+window.addEventListener("load", sendWebsite);

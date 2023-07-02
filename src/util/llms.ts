@@ -16,13 +16,35 @@ export class GPT extends LLM {
     searchPort: Runtime.Port;
     chatCompletionStream: (chat: Chat) => Promise<ReadableStream<Uint8Array>> = async (chat) => {
         const { key } = useStore.getState();
-        const lastMessage = chat.messages[chat.messages.length - 1];
-        console.log(`Searching for documents similar to ${lastMessage.content}`);
+        const lastMessage: string = chat.messages[chat.messages.length - 1].content;
+        // const condenseQuestionPrompt: string = prompt.getCondenseQuestionPrompt(chat);
+        // const decoder = new TextDecoder("utf-8");
+        // const condensedQuestionStream: ReadableStream<Uint8Array> = await OpenAI(
+        //     "completions",
+        //     {
+        //         model: "gpt-3.5-turbo",
+        //         prompt: condenseQuestionPrompt,
+        //     },
+        //     {
+        //         apiKey: key,
+        //     }
+        // );
+        // let condensedQuestion: string | string[] = [];
+
+        // for await (const chunk of condensedQuestionStream) {
+        //     condensedQuestion.push(decoder.decode(chunk));
+        // }
+        // condensedQuestion = condensedQuestion.join('');
+        const condensedQuestion: string = lastMessage;
+        console.log(`Condensed question: ${condensedQuestion}`);
+            
+        console.log(`Searching for documents similar to ${condensedQuestion}`);
         // const context: IVSSimilaritySearchItem<WebsiteMetadata>[] = [];
         // message service worker to perform search using browser runtime
         const port: Runtime.Port = browser.runtime.connect({ name: "search" });
+
         port.postMessage({
-            query: lastMessage.content,
+            query: condensedQuestion,
             k: CONTEXT_K,
         });
         const context: IVSSimilaritySearchItem<WebsiteMetadata>[] = await new Promise((resolve, reject) => {
@@ -33,7 +55,7 @@ export class GPT extends LLM {
         console.log(`Found ${context.length} similar documents:`);
         console.log(context.map((item) => item.metadata.title));
 
-        const lastMessageWithContext = prompt.getTaskPrompt(context, lastMessage.content);
+        const lastMessageWithContext = prompt.getTaskPrompt(context, lastMessage);
 
         const chatToSend = JSON.parse(JSON.stringify(chat));
         chatToSend.messages.unshift({

@@ -30,6 +30,7 @@ browser.runtime.onConnect.addListener((port: Runtime.Port) => {
     port.onMessage.addListener(async (website: RawWebsiteContent) => {
       console.log("Website received", website);
       if (!vectordb) {
+        port.postMessage(false);
         return;
       }
 
@@ -38,12 +39,14 @@ browser.runtime.onConnect.addListener((port: Runtime.Port) => {
 
       if (maxAge === -1) {
         console.log(`Website not stored: ${website.url}`);
+        port.postMessage(true);
         return;
       }
 
       const earliestTime = Date.now() - maxAge;
       if (storageTime && storageTime > earliestTime) {
         console.log(`Website already stored: ${website.url}`);
+        port.postMessage(true);
         return;
       }
 
@@ -62,6 +65,7 @@ browser.runtime.onConnect.addListener((port: Runtime.Port) => {
       const documents = await vectordb.add(contents);
       await localforage.setItem(storageKey, Date.now());
       console.log("Documents added", documents);
+      port.postMessage(true);
     });
 
     connected = true;
