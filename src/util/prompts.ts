@@ -43,7 +43,7 @@ export abstract class Prompt {
 export class GPTPrompt extends Prompt {
     protected systemPrompt: string = `You are an AI assistant that answers questions based on context from websites the user has visited. Prioritize context that is most relevant to the user's question, most recent, and with highest score. Provide a conversational answer. If you don't know the answer, just say "Hmm, I'm not sure." Don't try to make up an answer and do not use markdown.`;
     protected taskPrompt: string = `Context:\n${CONTEXT_STRING}Current Time: ${DATETIME_STRING}Question: ${TASK_STRING}`;
-    protected condenseQuestionPrompt: string = `Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.\n\nChat history:${CONTEXT_STRING}\nFollow up question: ${TASK_STRING}\nStandalone question: `;
+    protected condenseQuestionPrompt: string = `Given the following conversation and latest message, decide if external data outside of the conversation needs to be retrieved to answer the message. If so, rephrase the message to be a standalone question and reply with only that question, nothing else. If a response can be made with the data on hand or they are saying something extremely general like "hey" or "what's up?", call the answerDirectly fuction.\n\nChat history:${CONTEXT_STRING}\nLatest message: ${TASK_STRING}\nStandalone question: `;
 }
 
 export function messagesToString(messages: Message[]): string {
