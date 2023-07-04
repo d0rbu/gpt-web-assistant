@@ -19,12 +19,10 @@ export default function() {
 
     const message: Message = {
       content,
-      timestamp: new Date(),
       sender: "user",
     }
     const reply: Message = {
       content: "",
-      timestamp: new Date(),
       sender: "assistant",
     }
 

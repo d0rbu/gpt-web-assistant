@@ -1,13 +1,13 @@
 import browser, { Runtime } from "webextension-polyfill";
 import { VectorStorageDB, VectorDB } from "./util/vectordb";
-import { RawWebsiteContent, WebsiteContent, WebsiteMetadata } from "./util/types";
+import { RawWebsiteContent, WebsiteContent, WebsiteMetadata, MessageMetadata } from "./util/types";
 import { splitDocument, getStorageInfo } from "./util/processSites";
 import { IVSSimilaritySearchItem } from "vector-storage";
 import localforage from "localforage";
 
 
 let vectordb: VectorDB | null = null;
-const CHUNK_SIZE: number = 1000;
+const CHUNK_SIZE: number = 300;
 
 
 browser.runtime.onConnect.addListener((port: Runtime.Port) => {
@@ -69,14 +69,24 @@ browser.runtime.onConnect.addListener((port: Runtime.Port) => {
     });
 
     connected = true;
-  } else if (port.name === "search") {
+  } else if (port.name === "searchSites") {
     port.onMessage.addListener(async ({ query, k }: { query: string, k: number }) => {
       if (!vectordb) {
         return;
       }
 
-      const results: IVSSimilaritySearchItem<WebsiteMetadata>[] = await vectordb.search(query, k);
-      console.log("Search results", results);
+      const results: IVSSimilaritySearchItem<WebsiteMetadata>[] = await vectordb.searchWebsites(query, k);
+      console.log("Website search results", results);
+      port.postMessage(results);
+    });
+  } else if (port.name === "searchMessages") {
+    port.onMessage.addListener(async ({ query, k }: { query: string, k: number }) => {
+      if (!vectordb) {
+        return;
+      }
+
+      const results: IVSSimilaritySearchItem<MessageMetadata>[] = await vectordb.searchMessages(query, k);
+      console.log("Message search results", results);
       port.postMessage(results);
     });
   }

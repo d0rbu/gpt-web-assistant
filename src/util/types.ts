@@ -1,12 +1,13 @@
 import { VectorDB, VectorStorageDB } from "./vectordb";
 import { useStore } from "../state/store";
-import { Readability } from "@mozilla/readability";
 
 
-export interface Message {
-  content: string;
-  timestamp: Date;
+export interface MessageMetadata {
   sender: string;
+}
+
+export interface Message extends MessageMetadata {
+  content: string;
 }
 
 export interface Chat {
