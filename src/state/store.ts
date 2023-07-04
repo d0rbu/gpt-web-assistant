@@ -1,3 +1,4 @@
+import browser, { Runtime } from "webextension-polyfill";
 import { create } from 'zustand';
 import { persist, createJSONStorage, subscribeWithSelector } from 'zustand/middleware';
 import { Message, Chat, LLM } from '../util/types';
@@ -39,6 +40,11 @@ export const useStore = create<KeyStore>()(
         addToChat: (chatIdx, message) => {
           const chats = [...get().chats];
           chats[chatIdx].messages.push(message);
+
+          // send to background script
+          const port: Runtime.Port = browser.runtime.connect({ name: "message" });
+          port.postMessage(message);
+          
           set({ chats });
         },
         addToLastChatMessageContent: (chatIdx, content) => {

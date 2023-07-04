@@ -1,6 +1,6 @@
 import browser, { Runtime } from "webextension-polyfill";
 import { VectorStorageDB, VectorDB } from "./util/vectordb";
-import { RawWebsiteContent, WebsiteContent, WebsiteMetadata, MessageMetadata } from "./util/types";
+import { RawWebsiteContent, WebsiteContent, WebsiteMetadata, Message, MessageMetadata } from "./util/types";
 import { splitDocument, getStorageInfo } from "./util/processSites";
 import { IVSSimilaritySearchItem } from "vector-storage";
 import localforage from "localforage";
@@ -65,6 +65,20 @@ browser.runtime.onConnect.addListener((port: Runtime.Port) => {
       const documents = await vectordb.add(contents);
       await localforage.setItem(storageKey, Date.now());
       console.log("Documents added", documents);
+      port.postMessage(true);
+    });
+
+    connected = true;
+  } else if (port.name === "message") {
+    port.onMessage.addListener(async (message: Message) => {
+      console.log("Message received", message);
+      if (!vectordb) {
+        port.postMessage(false);
+        return;
+      }
+
+      const document = await vectordb.add(message);
+      console.log("Message added", document);
       port.postMessage(true);
     });
 
