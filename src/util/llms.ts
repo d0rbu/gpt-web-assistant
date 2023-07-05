@@ -118,7 +118,7 @@ export class GPT extends LLM {
         });
         chatToSend.messages[chatToSend.messages.length - 1].content = lastMessageWithContext;
 
-        console.log(lastMessageWithContext);
+        console.log(chatToSend);
         
         return OpenAI(
             "chat",

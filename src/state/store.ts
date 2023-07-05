@@ -16,6 +16,7 @@ interface KeyStore {
   addChat: (chat: Chat) => void;
   removeChat: (chatIdx: number) => void;
   addToChat: (chatIdx: number, message: Message) => void;
+  embedMessage: (message: Message) => void;
   addToLastChatMessageContent: (chatIdx: number, content: string) => void;
 }
 
@@ -41,11 +42,15 @@ export const useStore = create<KeyStore>()(
           const chats = [...get().chats];
           chats[chatIdx].messages.push(message);
 
+          set({ chats });
+        },
+        embedMessage: (message) => {
           // send to background script
           const port: Runtime.Port = browser.runtime.connect({ name: "message" });
-          port.postMessage(message);
-          
-          set({ chats });
+
+          if (message) {
+            port.postMessage(message);
+          }
         },
         addToLastChatMessageContent: (chatIdx, content) => {
           const chats = [...get().chats];

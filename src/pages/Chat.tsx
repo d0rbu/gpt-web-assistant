@@ -7,7 +7,7 @@ import ChatBox from '../components/ChatBox';
 
 
 export default function() {
-  const { key, chatIdx, setChatIdx, chats, llm, addToChat, addChat, addToLastChatMessageContent } = useStore();
+  const { key, chatIdx, setChatIdx, chats, llm, addToChat, embedMessage, addChat, addToLastChatMessageContent } = useStore();
   const [thinking, setThinking] = useState<boolean>(false);
 
   useEffect(() => {
@@ -41,6 +41,7 @@ export default function() {
       // deep copy
       currentChat = JSON.parse(JSON.stringify(chats[chatIdx]));
       addToChat(chatIdx, message);
+      embedMessage(message);
       addToChat(chatIdx, reply);
     }
 
@@ -77,7 +78,7 @@ export default function() {
       // console log chunk but replace newlines with \n characters
       addToLastChatMessageContent(chatIdx, chunk);
     }
-
+    embedMessage(reply);  // by this point the reply should be done and ready to embed
 
     setThinking(false);
   }
