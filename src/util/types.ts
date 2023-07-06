@@ -4,6 +4,8 @@ import { useStore } from "../state/store";
 
 export interface MessageMetadata {
   sender: string;
+  id: string;
+  website: boolean;
 }
 
 export interface Message extends MessageMetadata {
@@ -13,6 +15,7 @@ export interface Message extends MessageMetadata {
 export interface Chat {
   title: string;
   messages: Message[];
+  id: string;
 }
 
 export abstract class LLM {
@@ -23,6 +26,7 @@ export abstract class LLM {
 export interface WebsiteMetadata {
   title: string;
   url: string;
+  website: boolean;
 }
 
 export interface WebsiteContent extends WebsiteMetadata {

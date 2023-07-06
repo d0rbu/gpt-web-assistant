@@ -11,7 +11,7 @@ export abstract class VectorDB {
         }
     }
     public abstract searchWebsites(query: string, k?: number): Promise<IVSSimilaritySearchItem<WebsiteMetadata>[]>;
-    public abstract searchMessages(query: string, k?: number): Promise<IVSSimilaritySearchItem<MessageMetadata>[]>;
+    public abstract searchMessages(query: string, k?: number, chatId?: string): Promise<IVSSimilaritySearchItem<MessageMetadata>[]>;
     
     protected abstract addContents(contents: (WebsiteContent | Message)[]): Promise<IVSDocument<WebsiteMetadata | MessageMetadata>[]>;
 }
@@ -37,7 +37,7 @@ export class VectorStorageDB extends VectorDB {
         const filterOptions: IVSFilterOptions = {
             include: {
                 metadata: {
-                    sender: undefined,
+                    website: true,
                 },
             },
         };
@@ -45,14 +45,18 @@ export class VectorStorageDB extends VectorDB {
         return this.searchFiltered(query, k, filterOptions).then((results) => results as IVSSimilaritySearchItem<WebsiteMetadata>[]);
     }
 
-    public async searchMessages(query: string, k?: number) {
+    public async searchMessages(query: string, k?: number, chatId?: string) {
         const filterOptions: IVSFilterOptions = {
-            exclude: {
+            include: {
                 metadata: {
-                    sender: undefined,
+                    website: false,
                 },
             },
         };
+
+        if (chatId && filterOptions?.include?.metadata) {
+            filterOptions.include.metadata.id = chatId;
+        }
 
         return this.searchFiltered(query, k, filterOptions).then((results) => results as IVSSimilaritySearchItem<MessageMetadata>[]);
     }
@@ -82,13 +86,16 @@ export class VectorStorageDB extends VectorDB {
                 (accumulator.metadatas as WebsiteMetadata[]).push({
                     title: content.title,
                     url: content.url,
+                    website: true,
                 });
                 return accumulator;
             } else {
                 accumulator.texts.push(content.content);
                 // push everything but message contents
                 (accumulator.metadatas as MessageMetadata[]).push({
+                    id: content.id,
                     sender: content.sender,
+                    website: false,
                 });
                 return accumulator;
             }

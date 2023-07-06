@@ -63,7 +63,9 @@ export class GPT extends LLM {
                 function_call: "auto",
             })
             const condensedQuestionResponse = condensedQuestionCompletion.data.choices[0].message;
-            if (condensedQuestionResponse?.content && !condensedQuestionResponse.content.includes("answerDirectly")) {  // if it replied with a condensed question
+            // check if it includes answerdirectly in any case, with or without a space in between the words
+            const answerDirectlyRegex = /answer ?directly/i;
+            if (condensedQuestionResponse?.content && !answerDirectlyRegex.test(condensedQuestionResponse.content)) {  // if it replied with a condensed question
                 condensedQuestion = condensedQuestionResponse.content;
             } else {
                 console.log("No condensed question response");
@@ -74,7 +76,7 @@ export class GPT extends LLM {
 
         let lastMessageWithContext = lastMessage;
         if (condensedQuestion) {
-            console.log(`Searching for documents similar to ${condensedQuestion}`);
+            console.log(`Searching for website documents similar to ${condensedQuestion}`);
     
             this.searchWebsitesPort.postMessage({
                 query: condensedQuestion,
@@ -88,12 +90,14 @@ export class GPT extends LLM {
             
                 this.searchWebsitesPort.onMessage.addListener(listener);
             });
-            console.log(`Found ${websiteContext.length} similar documents for websites:`);
+            console.log(`Found ${websiteContext.length} similar website documents:`);
             console.log(websiteContext.map((item) => item.metadata.title));
             
+            console.log(`Searching for message documents similar to ${condensedQuestion}`);
             this.searchMessagesPort.postMessage({
                 query: condensedQuestion,
                 k: MESSAGE_CONTEXT_K,
+                chatId: chat.id,
             });
             const messageContext: IVSSimilaritySearchItem<MessageMetadata>[] = await new Promise((resolve, reject) => {
                 const listener = (results: IVSSimilaritySearchItem<MessageMetadata>[]) => {
@@ -103,18 +107,19 @@ export class GPT extends LLM {
             
                 this.searchMessagesPort.onMessage.addListener(listener);
             });
-            console.log(`Found ${websiteContext.length} similar documents for websites:`);
-            console.log(websiteContext.map((item) => item.metadata.title));
+            console.log(`Found ${messageContext.length} similar message documents:`);
+            console.log(messageContext.map((item) => item.text));
     
             lastMessageWithContext = prompt.getTaskPrompt(websiteContext, messageContext, lastMessage);
         }
 
         const chatToSend = JSON.parse(JSON.stringify(chat));
-        chatToSend.messages = chatToSend.messages.slice(chatToSend.messages.length - PAST_MESSAGES_K - 1, chatToSend.messages.length - 1);
+        chatToSend.messages = chatToSend.messages.slice(chatToSend.messages.length - PAST_MESSAGES_K - 1, chatToSend.messages.length);
         chatToSend.messages.unshift({
             content: prompt.getSystemPrompt(),
             sender: 'system',
             timestamp: new Date(),
+            id: chat.id,
         });
         chatToSend.messages[chatToSend.messages.length - 1].content = lastMessageWithContext;
 

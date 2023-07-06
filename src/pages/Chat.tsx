@@ -20,28 +20,38 @@ export default function() {
     const message: Message = {
       content,
       sender: "user",
+      id: "",
     }
     const reply: Message = {
       content: "",
       sender: "assistant",
+      id: "",
     }
 
     let currentChat: Chat;
 
     if (chatIdx < 0 || chatIdx >= chats.length) {
+      const newId = crypto.randomUUID();
       const newChat: Chat = {
         title: "",
         messages: [message, reply],
+        id: newId,
       }
+
+      message.id = newId;
+      reply.id = newId;
 
       currentChat = JSON.parse(JSON.stringify(newChat));
       setChatIdx(chats.length);
       addChat(newChat);
     } else {
+      message.id = chats[chatIdx].id;
+      reply.id = chats[chatIdx].id;
+      
       // deep copy
       currentChat = JSON.parse(JSON.stringify(chats[chatIdx]));
       addToChat(chatIdx, message);
-      embedMessage(message);
+      embedMessage(chatIdx, message);
       addToChat(chatIdx, reply);
     }
 
@@ -78,7 +88,7 @@ export default function() {
       // console log chunk but replace newlines with \n characters
       addToLastChatMessageContent(chatIdx, chunk);
     }
-    embedMessage(reply);  // by this point the reply should be done and ready to embed
+    embedMessage(chatIdx, reply);  // by this point the reply should be done and ready to embed
 
     setThinking(false);
   }

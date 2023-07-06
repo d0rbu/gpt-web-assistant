@@ -57,6 +57,7 @@ browser.runtime.onConnect.addListener((port: Runtime.Port) => {
           title: website.parsed.title,
           url: website.url,
           text: chunk,
+          website: true,
         };
       });
 
@@ -86,6 +87,7 @@ browser.runtime.onConnect.addListener((port: Runtime.Port) => {
   } else if (port.name === "searchSites") {
     port.onMessage.addListener(async ({ query, k }: { query: string, k: number }) => {
       if (!vectordb) {
+        port.postMessage([]);
         return;
       }
 
@@ -94,12 +96,13 @@ browser.runtime.onConnect.addListener((port: Runtime.Port) => {
       port.postMessage(results);
     });
   } else if (port.name === "searchMessages") {
-    port.onMessage.addListener(async ({ query, k }: { query: string, k: number }) => {
+    port.onMessage.addListener(async ({ query, k, chatId }: { query: string, k: number, chatId: string }) => {
       if (!vectordb) {
+        port.postMessage([]);
         return;
       }
 
-      const results: IVSSimilaritySearchItem<MessageMetadata>[] = await vectordb.searchMessages(query, k);
+      const results: IVSSimilaritySearchItem<MessageMetadata>[] = await vectordb.searchMessages(query, k, chatId);
       console.log("Message search results", results);
       port.postMessage(results);
     });
