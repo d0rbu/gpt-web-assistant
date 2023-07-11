@@ -56,7 +56,7 @@ export default function ({ thinking, addMessage }: { thinking: boolean, addMessa
     <div className={`rounded-b-lg ${thinking ? "dark:bg-gray-600 bg-gray-200" : "dark:bg-gray-700 bg-gray-100"} w-full`}>
       <div className="flex flex-row w-full h-full dark:text-white">
         <form onSubmit={handleSubmit} ref={formRef} className="grow h-full px-3 pt-3 pb-2">
-          <textarea disabled={thinking} ref={textareaRef} rows={1} className="w-full bg-transparent dark:text-white text-md resize-none overflow-auto scrollbar-hide focus:outline-none" value={message} onChange={handleInputChange} onKeyDown={handleKeyDown} />
+          <textarea disabled={thinking} ref={textareaRef} rows={1} className="w-full bg-transparent dark:text-white text-md resize-none overflow-auto scrollbar-hide focus:outline-none" value={message} onChange={handleInputChange} onKeyDown={handleKeyDown} autoFocus />
         </form>
         <PaperAirplaneIcon className={`w-11 h-11 ${thinking ? "text-gray-400 dark:text-gray-400 cursor-not-allowed" : "text-gray-500 dark:text-gray-300 cursor-pointer"} p-3`} onClick={submitMessage} />
       </div>

@@ -4,6 +4,7 @@ import { Chat, Message, LLM } from '../util/types';
 import { useNavigate, Link } from "react-router-dom";
 import ChatWindow from '../components/ChatWindow';
 import ChatBox from '../components/ChatBox';
+import ChatSwitcher from '../components/ChatSwitcher';
 
 
 export default function() {
@@ -21,11 +22,13 @@ export default function() {
       content,
       sender: "user",
       id: "",
+      website: false,
     }
     const reply: Message = {
       content: "",
       sender: "assistant",
       id: "",
+      website: false,
     }
 
     let currentChat: Chat;
@@ -100,7 +103,8 @@ export default function() {
                 <h1 className="text-md underline">Set Key</h1>
             </Link>
         </div>
-        <h1 className="text-xl font-bold dark:text-white mb-6">Lumira🌙</h1>
+        <h1 className="text-xl font-bold dark:text-white">Lumira🌙</h1>
+        <ChatSwitcher thinking={thinking} chats={chats} chatIdx={chatIdx} setChatIdx={setChatIdx} />
         <ChatWindow thinking={thinking} />
         <ChatBox thinking={thinking} addMessage={addMessage} />
     </div>
