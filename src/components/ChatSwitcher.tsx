@@ -11,7 +11,7 @@ export default function ({ thinking, chats, chatIdx, setChatIdx }: { thinking: b
           return <ChatChip thinking={thinking} chat={chat} idx={index} key={index} selected={index === chatIdx} setChatIdx={setChatIdx} />
         })
       }
-      <ChatChip thinking={thinking} chat={null} idx={chats.length} key={chats.length} selected={true} setChatIdx={setChatIdx} />
+      <ChatChip thinking={thinking} chat={null} idx={chats.length} key={chats.length} selected={chats.length === chatIdx} setChatIdx={setChatIdx} />
     </div>
   );
 }
