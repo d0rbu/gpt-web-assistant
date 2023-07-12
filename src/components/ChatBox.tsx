@@ -2,7 +2,7 @@ import { useEffect, useState, createRef } from 'react';
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid'
 
 
-const TEXTAREA_MAX_HEIGHT = 100;
+const TEXTAREA_MAX_HEIGHT = 90;
 
 
 export default function ({ thinking, addMessage }: { thinking: boolean, addMessage: (message: string) => void }) {

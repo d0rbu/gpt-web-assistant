@@ -54,7 +54,6 @@ export default function() {
       // deep copy
       currentChat = JSON.parse(JSON.stringify(chats[chatIdx]));
       addToChat(chatIdx, message);
-      embedMessage(chatIdx, message);
       addToChat(chatIdx, reply);
     }
 
@@ -91,6 +90,7 @@ export default function() {
       // console log chunk but replace newlines with \n characters
       addToLastChatMessageContent(chatIdx, chunk);
     }
+    embedMessage(chatIdx, message);  // embed the message only after, so that it does not get included in message context twice
     embedMessage(chatIdx, reply);  // by this point the reply should be done and ready to embed
 
     setThinking(false);
@@ -104,7 +104,7 @@ export default function() {
             </Link>
         </div>
         <h1 className="text-xl font-bold dark:text-white">Lumira🌙</h1>
-        <ChatSwitcher thinking={thinking} chats={chats} chatIdx={chatIdx} setChatIdx={setChatIdx} />
+        <ChatSwitcher thinking={thinking} chats={chats} chatIdx={chatIdx} />
         <ChatWindow thinking={thinking} />
         <ChatBox thinking={thinking} addMessage={addMessage} />
     </div>
