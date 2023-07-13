@@ -5,7 +5,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 import ChatChip from './ChatChip';
 
 
-const SHOW_ARROWS_WIDTH = 384;
+const SHOW_ARROWS_WIDTH = 380;
 const VERTICAL_TO_HORIZONTAL_SCROLL_RATIO = 2;
 
 
@@ -59,7 +59,7 @@ export default function ({ thinking, chats, chatIdx }: { thinking: boolean, chat
       }
 
       const scrollAmt = event.deltaY;
-      chatChipsRef.current.scrollBy(scrollAmt / VERTICAL_TO_HORIZONTAL_SCROLL_RATIO, 0);
+      chatChipsRef.current.scrollBy({ left: scrollAmt / VERTICAL_TO_HORIZONTAL_SCROLL_RATIO, behavior: 'auto'});
     }
 
     chatChipsRef.current?.addEventListener('wheel', scrollSide);
