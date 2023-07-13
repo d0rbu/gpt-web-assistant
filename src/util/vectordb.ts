@@ -93,7 +93,7 @@ export class VectorStorageDB extends VectorDB {
                 accumulator.texts.push(content.content);
                 // push everything but message contents
                 (accumulator.metadatas as MessageMetadata[]).push({
-                    id: content.id,
+                    chatId: content.chatId,
                     sender: content.sender,
                     website: false,
                 });

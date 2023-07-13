@@ -18,6 +18,9 @@ export class GPT extends LLM {
     name: string = 'ChatGPT';
     searchWebsitesPort: Runtime.Port;
     searchMessagesPort: Runtime.Port;
+    openai: OpenAIApi | null;
+    unsubscribe: (() => void) | null = null;
+
     chatCompletionStream: (chat: Chat) => Promise<ReadableStream<Uint8Array>> = async (chat) => {
         const { key } = useStore.getState();
 
@@ -139,8 +142,34 @@ export class GPT extends LLM {
             }
         )
     }
-    openai: OpenAIApi | null;
-    unsubscribe: (() => void) | null = null;
+
+    titleChat: (chat: Chat) => Promise<string> = async (chat) => {
+        console.log(chat);
+        if (this.openai === null) {
+            return "";
+        }
+
+        const titleChatPrompt: string = prompt.getTitleChatPrompt(chat, PAST_MESSAGES_K);
+
+        console.log(titleChatPrompt);
+        const rawTitle = await this.openai.createChatCompletion({
+            model: "gpt-3.5-turbo-0613",
+            messages: [
+                { role: "user", content: titleChatPrompt },
+            ],
+        });
+
+        let title: string = "";
+        if (rawTitle.data.choices[0].message?.content) {
+            title = rawTitle.data.choices[0].message.content;
+
+            // strip quotations from either side of title
+            title = title.replace(/^"(.*)"$/, "$1");
+        }
+
+        return title;
+    }
+
 
     constructor(key?: string) {
         super();

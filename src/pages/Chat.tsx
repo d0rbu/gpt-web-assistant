@@ -21,13 +21,13 @@ export default function() {
     const message: Message = {
       content,
       sender: "user",
-      id: "",
+      chatId: "",
       website: false,
     }
     const reply: Message = {
       content: "",
       sender: "assistant",
-      id: "",
+      chatId: "",
       website: false,
     }
 
@@ -39,17 +39,18 @@ export default function() {
         title: "",
         messages: [message, reply],
         id: newId,
+        numEmbedded: 0,
       }
 
-      message.id = newId;
-      reply.id = newId;
+      message.chatId = newId;
+      reply.chatId = newId;
 
       currentChat = JSON.parse(JSON.stringify(newChat));
       setChatIdx(chats.length);
       addChat(newChat);
     } else {
-      message.id = chats[chatIdx].id;
-      reply.id = chats[chatIdx].id;
+      message.chatId = chats[chatIdx].id;
+      reply.chatId = chats[chatIdx].id;
       
       // deep copy
       currentChat = JSON.parse(JSON.stringify(chats[chatIdx]));

@@ -4,6 +4,13 @@ import { persist, createJSONStorage, subscribeWithSelector } from 'zustand/middl
 import { Message, Chat, LLM } from '../util/types';
 import LLMS from '../util/llms';
 
+
+// number of messages to be sent in a chat before creating a title
+const NUM_MESSAGES_FOR_TITLE: number = 3;
+
+let processingTitle: boolean = false;
+
+
 // Define the store
 interface KeyStore {
   key: string;
@@ -16,6 +23,7 @@ interface KeyStore {
   addChat: (chat: Chat) => void;
   removeChat: (chatIdx: number) => void;
   addToChat: (chatIdx: number, message: Message) => void;
+  setTitle: (chatIdx: number, title: string) => void;
   embedMessage: (chatIdx: number, message: Message) => void;
   addToLastChatMessageContent: (chatIdx: number, content: string) => void;
 }
@@ -44,13 +52,32 @@ export const useStore = create<KeyStore>()(
 
           set({ chats });
         },
+        setTitle: (chatIdx, title) => {
+          const chats = [...get().chats];
+          chats[chatIdx].title = title;
+          
+          set({ chats });
+        },
         embedMessage: (chatIdx, message) => {
           // send to background script
           const port: Runtime.Port = browser.runtime.connect({ name: "message" });
-          const chats = get().chats;
+          const { chats, llm } = get();
 
           if (message && chatIdx >= 0 && chatIdx < chats.length) {
             port.postMessage(message);
+          }
+
+          const newNumEmbedded = chats[chatIdx].numEmbedded + 1;
+
+          if (!processingTitle && chats[chatIdx].title === '' && chats[chatIdx].messages.length >= NUM_MESSAGES_FOR_TITLE && llm) {
+            processingTitle = true;
+            llm.titleChat(chats[chatIdx]).then((title) => {
+              chats[chatIdx].title = title;
+              chats[chatIdx].numEmbedded = newNumEmbedded;
+              processingTitle = false;
+
+              set({ chats });
+            });
           }
         },
         addToLastChatMessageContent: (chatIdx, content) => {
