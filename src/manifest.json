@@ -24,5 +24,9 @@
       "js": ["src/content.ts"],
       "run_at": "document_start"
     }
-  ]
+  ],
+  "name": "Lumira🌙",
+  "description": "Talk with your browsing history!",
+  "author": "henryandrecastillo@gmail.com",
+  "version": "1.0"
 }
