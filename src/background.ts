@@ -6,7 +6,7 @@ import { IVSSimilaritySearchItem } from "vector-storage";
 import localforage from "localforage";
 
 
-let vectordb: VectorDB | null = null;
+let vectordb: VectorDB<WebsiteMetadata | MessageMetadata> | null = null;
 const CHUNK_SIZE: number = 300;
 
 
