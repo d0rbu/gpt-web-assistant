@@ -10,7 +10,7 @@ import Key from './Key';
 
 
 export default function() {
-  const { key, setKey } = useStore();
+  const { key } = useStore();
   const navigate = useNavigate();
 
   useEffect(() => {
