@@ -55,7 +55,7 @@ export class VectorStorageDB extends VectorDB {
         };
 
         if (chatId && filterOptions?.include?.metadata) {
-            filterOptions.include.metadata.id = chatId;
+            filterOptions.include.metadata.chatId = chatId;
         }
 
         return this.searchFiltered(query, k, filterOptions).then((results) => results as IVSSimilaritySearchItem<MessageMetadata>[]);

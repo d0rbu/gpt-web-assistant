@@ -30,6 +30,7 @@ browser.runtime.onConnect.addListener((port: Runtime.Port) => {
     port.onMessage.addListener(async (website: RawWebsiteContent) => {
       console.log("Website received", website);
       if (!vectordb) {
+        console.log(`No vectordb, not storing: ${website.url}`);
         port.postMessage(false);
         return;
       }

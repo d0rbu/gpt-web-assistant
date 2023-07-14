@@ -5,7 +5,6 @@ import { GPT } from '../util/llms';
 import browser from "webextension-polyfill";
 
 
-const keyConnection = browser.runtime.connect({ name: "key" });
 
 export default function() {
   const { key, setKey, setLLM } = useStore();
@@ -13,6 +12,8 @@ export default function() {
 
   const submitKey = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    const keyConnection = browser.runtime.connect({ name: "key" });
 
     keyConnection.postMessage(key);
     setLLM(new GPT());

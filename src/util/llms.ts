@@ -16,8 +16,8 @@ const prompt: Prompt = new GPTPrompt();
 
 export class GPT extends LLM {
     name: string = 'ChatGPT';
-    searchWebsitesPort: Runtime.Port;
-    searchMessagesPort: Runtime.Port;
+    searchWebsitesPort: string = 'searchSites';
+    searchMessagesPort: string = 'searchMessages';
     openai: OpenAIApi | null;
     unsubscribe: (() => void) | null = null;
 
@@ -81,34 +81,36 @@ export class GPT extends LLM {
         if (condensedQuestion) {
             console.log(`Searching for website documents similar to ${condensedQuestion}`);
     
-            this.searchWebsitesPort.postMessage({
+            const searchWebsitesPort = browser.runtime.connect({ name: this.searchWebsitesPort });
+            searchWebsitesPort.postMessage({
                 query: condensedQuestion,
                 k: WEBSITE_CONTEXT_K,
             });
             const websiteContext: IVSSimilaritySearchItem<WebsiteMetadata>[] = await new Promise((resolve, reject) => {
                 const listener = (results: IVSSimilaritySearchItem<WebsiteMetadata>[]) => {
-                    this.searchWebsitesPort.onMessage.removeListener(listener);
+                    searchWebsitesPort.onMessage.removeListener(listener);
                     resolve(results);
                 };
             
-                this.searchWebsitesPort.onMessage.addListener(listener);
+                searchWebsitesPort.onMessage.addListener(listener);
             });
             console.log(`Found ${websiteContext.length} similar website documents:`);
             console.log(websiteContext.map((item) => item.metadata.title));
             
             console.log(`Searching for message documents similar to ${condensedQuestion}`);
-            this.searchMessagesPort.postMessage({
+            const searchMessagesPort = browser.runtime.connect({ name: this.searchMessagesPort });
+            searchMessagesPort.postMessage({
                 query: condensedQuestion,
                 k: MESSAGE_CONTEXT_K,
                 chatId: chat.id,
             });
             const messageContext: IVSSimilaritySearchItem<MessageMetadata>[] = await new Promise((resolve, reject) => {
                 const listener = (results: IVSSimilaritySearchItem<MessageMetadata>[]) => {
-                    this.searchMessagesPort.onMessage.removeListener(listener);
+                    searchMessagesPort.onMessage.removeListener(listener);
                     resolve(results);
                 };
             
-                this.searchMessagesPort.onMessage.addListener(listener);
+                searchMessagesPort.onMessage.addListener(listener);
             });
             console.log(`Found ${messageContext.length} similar message documents:`);
             console.log(messageContext.map((item) => item.text));
@@ -173,9 +175,7 @@ export class GPT extends LLM {
 
     constructor(key?: string) {
         super();
-        
-        this.searchWebsitesPort = browser.runtime.connect({ name: "searchSites" });
-        this.searchMessagesPort = browser.runtime.connect({ name: "searchMessages" });
+
         this.chatCompletionStream = this.chatCompletionStream.bind(this);
 
         if (key) {
