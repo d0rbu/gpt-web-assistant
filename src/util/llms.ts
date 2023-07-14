@@ -1,12 +1,10 @@
-import browser, { Runtime } from "webextension-polyfill";
-import { Chat, Message, LLM, WebsiteMetadata, MessageMetadata } from '../util/types';
-import { OpenAI } from 'openai-streams';
-import { useStore } from '../state/store';
-import { VectorStorageDB, VectorDB } from "../util/vectordb";
-import { GPTPrompt, Prompt } from './prompts';
-import { IVSSimilaritySearchItem } from 'vector-storage';
-import { yieldStream } from "yield-stream";
 import { Configuration, OpenAIApi } from "openai";
+import { OpenAI } from 'openai-streams';
+import { IVSSimilaritySearchItem } from 'vector-storage';
+import browser from "webextension-polyfill";
+import { useStore } from '../state/store';
+import { Chat, LLM, Message, MessageMetadata, WebsiteMetadata } from '../util/types';
+import { GPTPrompt, Prompt } from './prompts';
 
 
 const WEBSITE_CONTEXT_K: number = 8;  // external document context

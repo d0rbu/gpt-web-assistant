@@ -1,6 +1,5 @@
-import { IVSDocument, IVSSimilaritySearchItem } from "vector-storage";
-import { WebsiteMetadata, MessageMetadata } from "./types";
-import { Chat, Message } from "./types";
+import { IVSSimilaritySearchItem } from "vector-storage";
+import { Chat, Message, MessageMetadata, WebsiteMetadata } from "./types";
 
 
 const WEBSITE_CONTEXT_STRING = '{{WEBSITE_CONTEXT}}';

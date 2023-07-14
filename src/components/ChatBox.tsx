@@ -1,5 +1,5 @@
-import { useEffect, useState, createRef } from 'react';
-import { PaperAirplaneIcon } from '@heroicons/react/24/solid'
+import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
+import { createRef, useEffect, useState } from 'react';
 
 
 const TEXTAREA_MAX_HEIGHT = 90;

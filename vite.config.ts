@@ -1,7 +1,7 @@
-import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import webExtension, { readJsonFile } from "vite-plugin-web-extension";
 import path from "node:path";
+import { defineConfig } from "vite";
+import webExtension, { readJsonFile } from "vite-plugin-web-extension";
 
 function generateManifest() {
   const manifest = readJsonFile("src/manifest.json");

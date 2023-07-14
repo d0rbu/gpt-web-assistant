@@ -1,13 +1,12 @@
-import { useEffect, useState } from 'react';
-import { useStore } from '../state/store';
-import Key from './Key';
-import Chat from './Chat';
+import { useEffect } from 'react';
 import {
-  MemoryRouter,
-  Routes,
   Route,
-  useNavigate,
+  Routes,
+  useNavigate
 } from "react-router-dom";
+import { useStore } from '../state/store';
+import Chat from './Chat';
+import Key from './Key';
 
 
 export default function() {

@@ -1,7 +1,5 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useStore } from '../state/store';
-import { Chat, Message } from '../util/types';
-import { useNavigate, Link } from "react-router-dom";
 import ChatBubble from './ChatBubble';
 
 

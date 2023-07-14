@@ -1,9 +1,9 @@
-import browser, { Runtime } from "webextension-polyfill";
-import { VectorStorageDB, VectorDB } from "./util/vectordb";
-import { RawWebsiteContent, WebsiteContent, WebsiteMetadata, Message, MessageMetadata } from "./util/types";
-import { splitDocument, getStorageInfo } from "./util/processSites";
-import { IVSSimilaritySearchItem } from "vector-storage";
 import localforage from "localforage";
+import { IVSSimilaritySearchItem } from "vector-storage";
+import browser, { Runtime } from "webextension-polyfill";
+import { getStorageInfo, splitDocument } from "./util/processSites";
+import { Message, MessageMetadata, RawWebsiteContent, WebsiteContent, WebsiteMetadata } from "./util/types";
+import { VectorDB, VectorStorageDB } from "./util/vectordb";
 
 
 let vectordb: VectorDB<WebsiteMetadata | MessageMetadata> | null = null;

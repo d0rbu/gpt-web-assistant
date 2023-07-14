@@ -1,7 +1,6 @@
+import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../state/store';
-import { Chat, Message } from '../util/types';
-import { useEffect, useState, useRef } from 'react';
-import Loading from './Loading';
+import { Message } from '../util/types';
 
 
 const BOTTOM_LEEWAY = 12;

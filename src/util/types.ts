@@ -1,7 +1,3 @@
-import { VectorDB, VectorStorageDB } from "./vectordb";
-import { useStore } from "../state/store";
-
-
 export interface MessageMetadata {
   sender: string;
   chatId: string;

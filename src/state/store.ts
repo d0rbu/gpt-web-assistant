@@ -1,8 +1,8 @@
 import browser, { Runtime } from "webextension-polyfill";
 import { create } from 'zustand';
-import { persist, createJSONStorage, subscribeWithSelector } from 'zustand/middleware';
-import { Message, Chat, LLM } from '../util/types';
+import { persist, subscribeWithSelector } from 'zustand/middleware';
 import LLMS from '../util/llms';
+import { Chat, LLM, Message } from '../util/types';
 
 
 // number of messages to be sent in a chat before creating a title

@@ -1,6 +1,6 @@
+import { Readability } from "@mozilla/readability";
 import browser, { Runtime } from "webextension-polyfill";
 import { RawWebsiteContent } from "./util/types";
-import { Readability } from "@mozilla/readability";
 
 
 const SEND_DELAY: number = 8000;

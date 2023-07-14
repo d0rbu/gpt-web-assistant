@@ -1,5 +1,5 @@
-import { WebsiteContent, WebsiteMetadata, Message, MessageMetadata } from "./types";
-import { VectorStorage, IVSDocument, IVSSimilaritySearchParams, IVSSimilaritySearchItem, IVSFilterOptions } from "vector-storage";
+import { IVSDocument, IVSFilterOptions, IVSSimilaritySearchItem, IVSSimilaritySearchParams, VectorStorage } from "vector-storage";
+import { Message, MessageMetadata, WebsiteContent, WebsiteMetadata } from "./types";
 
 
 export abstract class VectorDB<T> {

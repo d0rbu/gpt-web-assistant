@@ -1,7 +1,6 @@
-import { useEffect, useState, useRef } from 'react';
-import { useStore } from '../state/store';
-import { Chat, Message } from '../util/types';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
+import { useEffect, useRef, useState } from 'react';
+import { Chat } from '../util/types';
 import ChatChip from './ChatChip';
 
 
