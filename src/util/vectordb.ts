@@ -2,8 +2,8 @@ import { WebsiteContent, WebsiteMetadata, Message, MessageMetadata } from "./typ
 import { VectorStorage, IVSDocument, IVSSimilaritySearchParams, IVSSimilaritySearchItem, IVSFilterOptions } from "vector-storage";
 
 
-export abstract class VectorDB {
-    public async add(content: WebsiteContent | WebsiteContent[] | Message | Message[]): Promise<IVSDocument<WebsiteMetadata | MessageMetadata>[] | IVSDocument<WebsiteMetadata | MessageMetadata>> {
+export abstract class VectorDB<T> {
+    public async add(content: T | T[]): Promise<IVSDocument<T>[] | IVSDocument<T>> {
         if (content instanceof Array) {
             return this.addContents(content);
         } else {
@@ -13,21 +13,21 @@ export abstract class VectorDB {
     public abstract searchWebsites(query: string, k?: number): Promise<IVSSimilaritySearchItem<WebsiteMetadata>[]>;
     public abstract searchMessages(query: string, k?: number, chatId?: string): Promise<IVSSimilaritySearchItem<MessageMetadata>[]>;
     
-    protected abstract addContents(contents: (WebsiteContent | Message)[]): Promise<IVSDocument<WebsiteMetadata | MessageMetadata>[]>;
+    protected abstract addContents(contents: T[]): Promise<IVSDocument<T>[]>;
 }
 
 
-function isWebsiteMetadata(content: WebsiteMetadata | MessageMetadata): content is WebsiteMetadata {
+function isWebsiteMetadata(content: any): content is WebsiteMetadata {
     return (content as WebsiteMetadata).url !== undefined;
 }
 
 
-export class VectorStorageDB extends VectorDB {
-    private store: VectorStorage<WebsiteMetadata | MessageMetadata>;
+export class VectorStorageDB<T> extends VectorDB<T> {
+    private store: VectorStorage<T>;
     
     constructor(key: string) {
         super();
-        this.store = new VectorStorage<WebsiteMetadata | MessageMetadata>({
+        this.store = new VectorStorage<T>({
             openAIApiKey: key,
             openaiModel: "text-embedding-ada-002",
         });
@@ -61,7 +61,7 @@ export class VectorStorageDB extends VectorDB {
         return this.searchFiltered(query, k, filterOptions).then((results) => results as IVSSimilaritySearchItem<MessageMetadata>[]);
     }
 
-    public async searchFiltered(query: string, k?: number, filterOptions?: IVSFilterOptions): Promise<IVSSimilaritySearchItem<WebsiteMetadata | MessageMetadata>[]> {
+    public async searchFiltered(query: string, k?: number, filterOptions?: IVSFilterOptions): Promise<IVSSimilaritySearchItem<T>[]> {
         const searchParams: IVSSimilaritySearchParams = {
             query,
             k,
@@ -78,10 +78,11 @@ export class VectorStorageDB extends VectorDB {
         });
     }
 
-    protected async addContents(contents: WebsiteContent[] | Message[]): Promise<IVSDocument<WebsiteMetadata | MessageMetadata>[]> {
-        const { texts, metadatas }: { texts: string[], metadatas: WebsiteMetadata[] | MessageMetadata[] } = contents.reduce((accumulator: { texts: string[], metadatas: WebsiteMetadata[] | MessageMetadata[] }, content: WebsiteContent | Message) => {
+    protected async addContents(contents: T[]): Promise<IVSDocument<T>[]> {
+        const { texts, metadatas }: { texts: string[], metadatas: T[] } = contents.reduce((accumulator: { texts: string[], metadatas: T[] }, content: any) => {
             if (isWebsiteMetadata(content)) {
-                accumulator.texts.push(content.text);
+                const websiteContent = content as WebsiteContent;
+                accumulator.texts.push(websiteContent.text);
                 // push everything but text
                 (accumulator.metadatas as WebsiteMetadata[]).push({
                     title: content.title,
@@ -90,6 +91,7 @@ export class VectorStorageDB extends VectorDB {
                 });
                 return accumulator;
             } else {
+                const messageContent = content as Message;
                 accumulator.texts.push(content.content);
                 // push everything but message contents
                 (accumulator.metadatas as MessageMetadata[]).push({
