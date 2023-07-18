@@ -5,6 +5,7 @@ import ChatSwitcher from '../components/ChatSwitcher';
 import ChatWindow from '../components/ChatWindow';
 import { useStore } from '../state/store';
 import { Chat, Message } from '../util/types';
+import { Cog6ToothIcon } from '@heroicons/react/24/solid';
 
 
 export default function() {
@@ -98,13 +99,15 @@ export default function() {
   }
   
   return (
-    <div className="flex flex-col items-center w-[26rem] p-2 dark:bg-gray-900">
-        <div className="w-full flex flex-row justify-between dark:text-white">
-            <Link to="/key">
-                <h1 className="text-md underline">Set Key</h1>
-            </Link>
-        </div>
-        <h1 className="text-xl font-bold dark:text-white">Lumira🌙</h1>
+    <div className="flex flex-col items-center w-[26rem] p-2 dark:bg-gray-900 dark:text-white">
+        <Link to="/key">
+            <h1 className="text-md underline absolute top-2 left-2">Set Key</h1>
+        </Link>
+        <p className={`text-red-600 ${key ? "invisible" : "visible"}`}>Warning: No OpenAI key is set!</p>
+        <Link to="/settings">
+          <Cog6ToothIcon className="w-7 h-7 dark:text-gray-300 absolute top-2 right-2" />
+        </Link>
+        <h1 className="text-xl font-bold">Lumira🌙</h1>
         <ChatSwitcher thinking={thinking} chats={chats} chatIdx={chatIdx} />
         <ChatWindow thinking={thinking} />
         <ChatBox thinking={thinking} addMessage={addMessage} />

@@ -7,6 +7,7 @@ import {
 import { useStore } from '../state/store';
 import Chat from './Chat';
 import Key from './Key';
+import Settings from './Settings';
 
 
 export default function() {
@@ -22,6 +23,7 @@ export default function() {
     <Routes>
       <Route path="/key" element={<Key />} />
       <Route path="/chat" element={<Chat />} />
+      <Route path="/settings" element={<Settings />} />
     </Routes>
   )
 }
