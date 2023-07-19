@@ -1,17 +1,19 @@
 import browser from "webextension-polyfill";
 import { useStore } from '../state/store';
-import { GPT } from '../util/llms';
 import { Link } from "react-router-dom";
 import { ChatBubbleOvalLeftIcon } from '@heroicons/react/24/outline';
+import { useEffect, useState } from "react";
 
 
-function slideOptions(props: { options: string[], setOption: (option: string) => void }) {
+function slideoptions(props: { options: string[], setOption: (option: string) => void }) {
   return (
     <div>
       
     </div>
   )
 }
+
+const SlideOptions = slideoptions;
 
 
 function setting(props: { name: string, children: React.ReactNode }) {
@@ -31,6 +33,7 @@ const Setting = setting;  // dumb hot reload dont be recognizing the function if
 
 export default function() {
   const { key, setKey, setLLM } = useStore();
+  const [filteringMode, setFilteringMode] = useState<string>("whitelist");
   
   return (
     <div className="flex flex-col w-[26rem] p-2 dark:bg-gray-800 dark:text-white gap-3">
@@ -43,7 +46,7 @@ export default function() {
         <h1 className="text-xl font-bold">Settings</h1>
       </div>
       <Setting name="Website Filtering Mode">
-        <div className="text-lg">yea</div>
+        <SlideOptions options={["whitelist", "blacklist"]} setOption={setFilteringMode} />
       </Setting>
     </div>
   );
