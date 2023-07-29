@@ -19,6 +19,8 @@ interface KeyStore {
   setChatIdx: (chatIdx: number) => void;
   llm?: LLM;
   setLLM: (llm: LLM) => void;
+  filteringMode: string;
+  setFilteringMode: (filteringMode: string) => void;
   chats: Chat[];
   addChat: (chat: Chat) => void;
   removeChat: (chatIdx: number) => void;
@@ -39,6 +41,13 @@ export const useStore = create<KeyStore>()(
         setChatIdx: (chatIdx) => set({ chatIdx }),
         llm: undefined,
         setLLM: (llm) => set({ llm }),
+        filteringMode: 'blocklist',
+        setFilteringMode: (filteringMode) => {
+          // send to background script
+          const port: Runtime.Port = browser.runtime.connect({ name: "filteringMode" });
+          port.postMessage(filteringMode);
+          set({ filteringMode })
+        },
         chats: [],
         addChat: (chat) => set((state) => ({ chats: [...state.chats, chat] })),
         removeChat: (chatIdx) => {

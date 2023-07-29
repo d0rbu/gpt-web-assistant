@@ -6,9 +6,14 @@ import { Message, MessageMetadata, RawWebsiteContent, WebsiteContent, WebsiteMet
 import { VectorDB, VectorStorageDB } from "./util/vectordb";
 
 
-let vectordb: VectorDB<WebsiteMetadata | MessageMetadata> | null = null;
 const CHUNK_SIZE: number = 300;
 const VECTORDB_KEY: string = "vector-storage-key";
+const FILTERING_MODE_KEY: string = "filtering-mode";
+const BLOCK_ALLOW_LIST_KEY: string = "block-allow-list";
+
+let vectordb: VectorDB<WebsiteMetadata | MessageMetadata> | null = null;
+let filteringMode: string = "blocklist";
+let blockAllowList: string[] = [];
 
 
 function getVectorDB(key: string): VectorDB<WebsiteMetadata | MessageMetadata> | null {
@@ -44,7 +49,7 @@ browser.runtime.onConnect.addListener((port: Runtime.Port) => {
       }
 
       const storageTime: number | null = await localforage.getItem(website.url);
-      const { storageKey, maxAge }: { storageKey: string, maxAge: number } = getStorageInfo(website.url);
+      const { storageKey, maxAge }: { storageKey: string, maxAge: number } = getStorageInfo(website.url, blockAllowList, filteringMode);
 
       if (maxAge === -1) {
         console.log(`Website not stored: ${website.url}`);
@@ -114,6 +119,18 @@ browser.runtime.onConnect.addListener((port: Runtime.Port) => {
       const results: IVSSimilaritySearchItem<MessageMetadata>[] = await vectordb.searchMessages(query, k, chatId);
       console.log("Message search results", results);
       port.postMessage(results);
+    });
+  } else if (port.name === "filteringMode") {
+    port.onMessage.addListener(async (receivedFilteringMode: string) => {
+      console.log("Filtering mode received", receivedFilteringMode);
+      localforage.setItem(FILTERING_MODE_KEY, receivedFilteringMode);
+      filteringMode = receivedFilteringMode;
+    });
+  } else if (port.name === "blockAllowList") {
+    port.onMessage.addListener(async (receivedBlockAllowList: string[]) => {
+      console.log("Block allow list received", receivedBlockAllowList);
+      localforage.setItem(BLOCK_ALLOW_LIST_KEY, receivedBlockAllowList);
+      blockAllowList = receivedBlockAllowList;
     });
   }
 

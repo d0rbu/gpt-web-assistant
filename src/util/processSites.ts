@@ -48,7 +48,32 @@ export function decomposeURL(url: string): URLComponents {
 }
 
 
-export function getStorageInfo(url: string): { storageKey: string, maxAge: number } {
+function containsWebsite(blockAllowList: string[], url: string): boolean {
+  // check each item in blockallowlist as regex
+  for (const item of blockAllowList) {
+    const regex: RegExp = new RegExp(item);
+    if (regex.test(url)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+export function getStorageInfo(url: string, blockAllowList: string[], filteringMode: string): { storageKey: string, maxAge: number } {
+  if (filteringMode === "blocklist" && containsWebsite(blockAllowList, url)) {
+    return {
+      storageKey: url,
+      maxAge: -1,
+    }
+  } else if (filteringMode === "allowlist" && !containsWebsite(blockAllowList, url)) {
+    return {
+      storageKey: url,
+      maxAge: -1,
+    }
+  }
+
   const components: URLComponents = decomposeURL(url);
   if (WEBSITE_INFO_FNS[components.website]) {
     return WEBSITE_INFO_FNS[components.website](components);
