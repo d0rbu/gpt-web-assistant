@@ -8,6 +8,20 @@ import { VectorDB, VectorStorageDB } from "./util/vectordb";
 
 let vectordb: VectorDB<WebsiteMetadata | MessageMetadata> | null = null;
 const CHUNK_SIZE: number = 300;
+const VECTORDB_KEY: string = "vector-storage-key";
+
+
+function getVectorDB(key: string): VectorDB<WebsiteMetadata | MessageMetadata> | null {
+  console.log("Key received", key);
+  if (!key) {
+    return null;
+  }
+
+  console.log(`DB connection created with key ${key}`)
+  // store key persistently
+  localforage.setItem(VECTORDB_KEY, key);
+  return new VectorStorageDB(key);
+}
 
 
 browser.runtime.onConnect.addListener((port: Runtime.Port) => {
@@ -16,13 +30,7 @@ browser.runtime.onConnect.addListener((port: Runtime.Port) => {
 
   if (port.name === "key") {
     port.onMessage.addListener((key: string) => {
-      console.log("Key received", key);
-      if (key) {
-        vectordb = new VectorStorageDB(key);
-        console.log(`DB connection created with key ${key}`)
-      } else {
-        vectordb = null;
-      }
+      vectordb = getVectorDB(key);
     });
 
     connected = true;
@@ -116,4 +124,13 @@ browser.runtime.onConnect.addListener((port: Runtime.Port) => {
 
 browser.runtime.onInstalled.addListener((details: any) => {
   console.log("Extension installed:", details);
+});
+
+browser.runtime.onStartup.addListener(async () => {
+  console.log("Extension started");
+  
+  const key: string | null = await localforage.getItem(VECTORDB_KEY);
+  if (key) {
+    vectordb = getVectorDB(key);
+  }
 });
